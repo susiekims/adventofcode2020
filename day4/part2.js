@@ -79,6 +79,15 @@ const { transformInput } = require("./part1");
 const isDateValid = (date, min, max) =>
   Number(date) >= min && Number(date) <= max;
 
+const isHeightValid = (value) => {
+  const [height, unit] = value.match(/[a-zA-Z]+|[0-9]+/g);
+  return unit === "in"
+    ? Number(height) >= 59 && Number(height) <= 76
+    : unit === "cm"
+    ? Number(height) >= 150 && Number(height) <= 193
+    : false;
+};
+
 const isValid = (field, value) => {
   switch (field) {
     case "byr":
@@ -88,16 +97,11 @@ const isValid = (field, value) => {
     case "eyr":
       return isDateValid(value, 2020, 2030);
     case "hgt":
-      const [height, unit] = value.match(/[a-zA-Z]+|[0-9]+/g);
-      return unit === "in"
-        ? Number(height) >= 59 && Number(height) <= 76
-        : unit === "cm"
-        ? Number(height) >= 150 && Number(height) <= 193
-        : false;
+      return isHeightValid(value)
     case "hcl":
       return /^#(?:[0-9a-fA-F]{3}){1,2}$/.test(value);
     case "ecl":
-      return /^amb$|^blu$|^brn$|^gry$|^grn$|^hzl$|^oth$/.test(value);
+      return /(amb|blu|brn|gry|grn|hzl|oth)/.test(value);
     case "pid":
       return /^\d{9}$/.test(value);
     default:
@@ -150,7 +154,6 @@ pid:545766238 ecl:hzl
 eyr:2022
 
 iyr:2010 hgt:158cm hcl:#b6652a ecl:blu byr:1944 eyr:2021 pid:093154719`;
-
 
 const fs = require("fs");
 const input = fs.readFileSync("day4/input.txt", "utf8");
