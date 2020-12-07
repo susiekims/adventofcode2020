@@ -54,33 +54,27 @@ vibrant plum bags contain 5 faded blue bags, 6 dotted black bags.
 faded blue bags contain no other bags.
 dotted black bags contain no other bags.`;
 
-const formatInput = (input) => {
-  return input.split("\n").reduce((acc, rule) => {
-    if (rule.includes("no other bags.")) {
-      return { ...acc, [rule.split(" bags contain no other bags.")[0]]: {} };
-    } else {
-      const splitRule = rule
-        .split(/ bags contain | bags, | bag.| bags./)
-        .filter((r) => Boolean(r) && r !== ".");
-
-      return {
-        ...acc,
-        [splitRule.shift()]: splitRule.reduce((acc, rule) => {
-          rule = rule.trim()
-          const amount = Number(rule.charAt(0));
-          return { ...acc, [rule.substring(2).trim()]: amount };
-        }, {}),
-      };
-    }
+const formatInput = (input) =>
+  input.split("\n").reduce((acc, rule) => {
+    const [bag, innerBags] = rule.split(/ bags contain /);
+    
+    return {
+      ...acc,
+      [bag]: innerBags.includes("no other bags")
+        ? 0
+        : innerBags.match(/[0-9]+ [a-z]+ [a-z]+/g).reduce((acc, innerBag) => {
+            const amount = Number(innerBag.charAt(0));
+            return { ...acc, [innerBag.substring(2)]: amount };
+          }, {}),
+    };
   }, {});
-};
 
-const matches = [];
+const matches = new Set();
 
 const part1 = (input, target) => {
   for (const color in input) {
     if (typeof input[color][target] !== "undefined") {
-      matches.push(color);
+      matches.add(color);
       part1(input, color);
     }
   }
@@ -90,6 +84,6 @@ const fs = require("fs");
 const input = fs.readFileSync("day7/input.txt", "utf8");
 
 part1(formatInput(input), "shiny gold");
-console.log(new Set(matches).size); // 316
+console.log(matches.size); // 316
 
 module.exports = { formatInput, testInput, input };
