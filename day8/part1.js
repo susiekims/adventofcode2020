@@ -71,10 +71,12 @@ acc +1
 jmp -4
 acc +6`.split('\n');
 
+let acc;
+
 const part1 = (input, acc) => {
   let i = 0;
   let visited = {};
-  let acc = 0
+  acc = 0
 
   while (i < input.length) {
     if (visited[i]) return acc;
