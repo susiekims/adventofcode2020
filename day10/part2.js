@@ -88,4 +88,4 @@ const formatInput = (input) => {
   return input
 }
 
-console.log(part2(formatInput(testInput)));
+console.log(part2(formatInput(input))); // 8099130339328
