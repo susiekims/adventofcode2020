@@ -97,19 +97,6 @@ Simulate your seating area by applying the seating rules repeatedly until no sea
 seats end up occupied?
 */
 
-const getNeighbour = (input, x, y) => {
-  if (
-    x >= 0 &&
-    x < input.length &&
-    y >= 0 &&
-    y < input[0].length &&
-    input[x][y] === "#"
-  ) {
-    return 1;
-  }
-  return 0;
-};
-
 const countNeighbours = (input, row, col) => {
   let count = 0;
   const neighbours = [
@@ -126,17 +113,15 @@ const countNeighbours = (input, row, col) => {
   for (let i = 0; i < neighbours.length; i++) {
     const row = neighbours[i][0];
     const col = neighbours[i][1];
-    count += getNeighbour(input, row, col);
+    count += input[row][col] === "#" ? 1 : 0;
   }
 
   return count;
 };
 
 const map = {};
-
 const part1 = (input) => {
   let count = 0;
-
   const copy = JSON.parse(JSON.stringify(input));
 
   for (let row = 0; row < input.length; row++) {
@@ -178,6 +163,11 @@ L.LLLLL.LL`
   .split("\n")
   .map((row) => row.split(""));
 
+const padInput = (input) => {
+  const emptyRow = [new Array(input[0].length + 2).fill(0)];
+  return emptyRow.concat(input.map((row) => [0, ...row, 0])).concat(emptyRow);
+};
+
 const fs = require("fs");
 const input = fs
   .readFileSync("day11/input.txt", "utf8")
@@ -185,5 +175,7 @@ const input = fs
   .map((row) => row.split(""));
 
 console.time("part1");
-console.log(part1(input));
+console.log(part1(padInput(input)));
 console.timeEnd("part1");
+
+module.exports = { input, padInput, testInput };
