@@ -20,6 +20,7 @@ L.LLLLL.LL
 LLLLLLLLLL
 L.LLLLLL.L
 L.LLLLL.LL
+
 Now, you just need to model the people who will be arriving shortly. Fortunately, people are entirely predictable 
 and always follow a simple set of rules. All decisions are based on the number of occupied seats adjacent to a 
 given seat (one of the eight positions immediately up, down, left, right, or diagonal from the seat). The 
@@ -95,34 +96,87 @@ rules cause no seats to change state! Once people stop moving around, you count 
 Simulate your seating area by applying the seating rules repeatedly until no seats change state. How many 
 seats end up occupied?
 */
-const countNeighbours = (input, x, y) => {
-  let count = 0;
-  for (let i = Math.max(0, y - 1); i <= Math.min(y + 1, input.length); i++) {
-    for (
-      let j = Math.max(0, x - 1);
-      j <= Math.min(x + 1, input[y].length);
-      j++
-    ) {
-      if (x !== j || y !== i && input[y][x] === '#') {
-        count++
-      }
-    }
+
+const getNeighbour = (input, x, y) => {
+  if (x >= 0 && x < input.length && y >= 0 && y < input[0].length) {
+    return input[x][y];
   }
+  return "";
+};
+
+const countNeighbours = (input, row, col) => {
+  let count = 0;
+  const neighbours = [
+    [row - 1, col - 1],
+    [row - 1, col],
+    [row - 1, col + 1],
+    [row, col - 1],
+    [row, col + 1],
+    [row + 1, col - 1],
+    [row + 1, col],
+    [row + 1, col + 1],
+  ];
+
+  neighbours.forEach(([row2, col2]) => {
+    if (getNeighbour(input, row2, col2) === "#") {
+      count++;
+    }
+  });
+
   return count;
 };
 
+const map = {};
 const part1 = (input) => {
-  for (let y = 0; y < input.length; y++) {
-    for (let x = 0; x < input[y].length; x++) {
-      console.log(x, y, countNeighbours(input, x, y));
+  let count = 0;
+
+  const copy = input.map(function (arr) {
+    return arr.slice();
+  });
+
+  for (let row = 0; row < input.length; row++) {
+    for (let col = 0; col < input[0].length; col++) {
+      if (input[row][col] === "#") {
+        count++;
+      }
+
+      if (input[row][col] === "#" && countNeighbours(input, row, col) >= 4) {
+        copy[row][col] = "L";
+        count--;
+      }
+
+      if (input[row][col] === "L" && countNeighbours(input, row, col) === 0) {
+        copy[row][col] = "#";
+        count++;
+      }
     }
   }
+
+  if (map[count]) {
+    return count;
+  }
+
+  map[count] = true;
+  return part1(copy);
 };
 
-console.log(
-  part1([
-    ["#", ".", "."],
-    ["#", "#", "."],
-    [".", ".", "."],
-  ])
-);
+const testInput = `L.LL.LL.LL
+LLLLLLL.LL
+L.L.L..L..
+LLLL.LL.LL
+L.LL.LL.LL
+L.LLLLL.LL
+..L.L.....
+LLLLLLLLLL
+L.LLLLLL.L
+L.LLLLL.LL`
+  .split("\n")
+  .map((row) => row.split(""));
+
+const fs = require("fs");
+const input = fs
+  .readFileSync("day11/input.txt", "utf8")
+  .split("\n")
+  .map((row) => row.split(""));
+
+console.log(part1(input));
