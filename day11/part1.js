@@ -98,10 +98,16 @@ seats end up occupied?
 */
 
 const getNeighbour = (input, x, y) => {
-  if (x >= 0 && x < input.length && y >= 0 && y < input[0].length) {
-    return input[x][y];
+  if (
+    x >= 0 &&
+    x < input.length &&
+    y >= 0 &&
+    y < input[0].length &&
+    input[x][y] === "#"
+  ) {
+    return 1;
   }
-  return "";
+  return 0;
 };
 
 const countNeighbours = (input, row, col) => {
@@ -117,22 +123,21 @@ const countNeighbours = (input, row, col) => {
     [row + 1, col + 1],
   ];
 
-  neighbours.forEach(([row2, col2]) => {
-    if (getNeighbour(input, row2, col2) === "#") {
-      count++;
-    }
-  });
+  for (let i = 0; i < neighbours.length; i++) {
+    const row = neighbours[i][0];
+    const col = neighbours[i][1];
+    count += getNeighbour(input, row, col);
+  }
 
   return count;
 };
 
 const map = {};
+
 const part1 = (input) => {
   let count = 0;
 
-  const copy = input.map(function (arr) {
-    return arr.slice();
-  });
+  const copy = JSON.parse(JSON.stringify(input));
 
   for (let row = 0; row < input.length; row++) {
     for (let col = 0; col < input[0].length; col++) {
@@ -179,4 +184,6 @@ const input = fs
   .split("\n")
   .map((row) => row.split(""));
 
+console.time("part1");
 console.log(part1(input));
+console.timeEnd("part1");
